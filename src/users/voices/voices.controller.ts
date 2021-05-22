@@ -1,34 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFiles, HttpCode, HttpStatus } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Role, Roles } from 'utils/roles';
+import { VoiceDTO } from './dto/voice.dto';
+import { VoiceEntity } from './entities/voice.entity';
 import { VoicesService } from './voices.service';
-import { CreateVoiceDto } from './dto/create-voice.dto';
-import { UpdateVoiceDto } from './dto/update-voice.dto';
 
-@Controller('voices')
+@Controller('users/:name/voices')
+@Role([Roles.HEAD_ADMIN, Roles.ADMIN])
 export class VoicesController {
   constructor(private readonly voicesService: VoicesService) {}
 
   @Post()
-  create(@Body() createVoiceDto: CreateVoiceDto) {
-    return this.voicesService.create(createVoiceDto);
+  @UseInterceptors(FileInterceptor('files'))
+  create(@Param('name') name: string, 
+    @UploadedFiles() files: Express.Multer.File[]): Promise<void> {
+
+    return this.voicesService.create(name, files);
   }
 
   @Get()
-  findAll() {
-    return this.voicesService.findAll();
+  async findAll(@Param('name') name: string): Promise<VoiceDTO[]> {
+    const voices: VoiceEntity[] = await this.voicesService.findAll(name);
+    return voices.map(v => ({id: v.id, path: v.path}));
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.voicesService.findOne(+id);
+  @Get(':vid')
+  loadFile(@Param('vid') vid: string) {
+    
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVoiceDto: UpdateVoiceDto) {
-    return this.voicesService.update(+id, updateVoiceDto);
+  @Get(':vid')
+  findOne(@Param('name') name: string, @Param('vid') vid: string) {
+
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.voicesService.remove(+id);
+  @Delete(':vid')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('name') name: string, @Param('vid') vid: string) {
+
   }
 }
