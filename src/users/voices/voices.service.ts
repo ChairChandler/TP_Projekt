@@ -17,25 +17,34 @@ export class VoicesService {
     const data_path = path.join('data', 'voices', name);
 
     // create user voice directory if not exists
-    try {
-      await fs.lstat(data_path);
-    } catch(e) {
-      await fs.mkdir(data_path)
-    }
-
-    const base_name = Date.now().toString();
-    const index = Math.round(Math.random()* Number.MAX_VALUE);
-    const owner_entity = await this.usersService.findOne(name);
-
-    
-    const fpath = path.join(data_path, `${base_name}_${index}`);
+    await this.createDirectory(data_path);
+    const fpath = path.join(data_path, this.generateUniqueFilename());
     await fs.writeFile(fpath, file.buffer);
-
-    return this.voices.create({
+    
+    const owner_entity = await this.usersService.findOne(name);
+    
+    const new_entity = this.voices.create({
       path: fpath, 
       owner: owner_entity, 
       speaker: owner_entity.speaker
-    }).id;
+    });
+
+    return new_entity.id;
+  }
+
+  private async createDirectory(path: string): Promise<void> {
+    try {
+      await fs.lstat(path);
+    } catch(e) {
+      await fs.mkdir(path)
+    }
+  }
+
+  private generateUniqueFilename(): string {
+    const base_name = Date.now().toString();
+    const index = Math.round(Math.random()* Number.MAX_VALUE);
+
+    return `${base_name}_${index}`;
   }
 
   async findAll(name: string): Promise<VoiceEntity[]> {

@@ -28,12 +28,14 @@ export class UsersService {
 
     async setRole(name: string, role: Roles): Promise<void> {
         if(role == Roles.HEAD_ADMIN) {
+            console.error('Set HEAD_ADMIN role forbidden');
             throw new ForbiddenException();
-          }
+        }
       
         const user: UserEntity = await this.findOne(name);
 
         if(user.role == Roles.HEAD_ADMIN) {
+            console.error('Change HEAD_ADMIN role forbidden');
             throw new ForbiddenException();
         }
       
