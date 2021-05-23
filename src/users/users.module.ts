@@ -4,8 +4,10 @@ import { Database } from 'utils/db_conn';
 import { UserEntity } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { VoicesModule } from './voices/voices.module';
 
 @Module({
+    imports: [VoicesModule],
     controllers: [UsersController],
     providers: [
         UsersService,
@@ -23,6 +25,11 @@ import { UsersService } from './users.service';
                 return db.getRepository(SpeakerEntity);
             }
         }
+    ],
+    exports: [
+        UsersService,
+        'USER_ENTITY',
+        'SPEAKER_ENTITY'
     ]
 })
 export class UsersModule {}

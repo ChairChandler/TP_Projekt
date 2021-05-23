@@ -18,9 +18,9 @@ export class UserEntity {
     })
     password: string;
 
-    @Column('enum', {
+    @Column('varchar', {
         name: 'role',
-        enum: [Roles.ADMIN, Roles.HEAD_ADMIN, Roles.USER]
+        length: 16
     })
     role: Roles;
 

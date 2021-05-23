@@ -1,9 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as fs from 'fs/promises';
+import * as fs_old from 'fs';
 import * as path from 'path';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users.service';
 import { VoiceEntity } from './entities/voice.entity';
+import { Stream } from 'stream';
 
 @Injectable()
 export class VoicesService {
@@ -11,7 +13,7 @@ export class VoicesService {
     private usersService: UsersService,
     @Inject('VOICE_ENTITY') private voices: Repository<VoiceEntity>) {}
 
-  async create(name: string, files: Express.Multer.File[]) {
+  async create(name: string, files: Express.Multer.File[]): Promise<void> {
     const data_path = path.join('data', 'voices', name);
 
     // create user voice directory if not exists
@@ -40,15 +42,16 @@ export class VoicesService {
     return owner_entity.voices;
   }
 
-  async loadFiles() {
-    
+  async loadFile(vid: number): Promise<Stream> {
+    const voice_entity = await this.findOne(vid);
+    return fs_old.createReadStream(voice_entity.path);
   }
 
-  findOne(name: string, vid: string) {
-    return `This action returns a #${id} voice`;
+  async findOne(vid: number): Promise<VoiceEntity> {
+    return this.voices.findOne(vid);
   }
 
-  remove(name: string, vid: string) {
-    return `This action removes a #${id} voice`;
+  async remove(vid: number): Promise<void> {
+    await this.voices.delete({id: vid});
   }
 }

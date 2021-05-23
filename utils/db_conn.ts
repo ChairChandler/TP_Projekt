@@ -10,7 +10,7 @@ export class Database {
     constructor() {
         this.conn = createConnection({
             type: "sqlite",
-            database: "tp",
+            database: "tp.db",
             entities: [
                 UserEntity, VoiceEntity, SpeakerEntity
             ],

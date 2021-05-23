@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFiles, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UseInterceptors, UploadedFiles, HttpCode, HttpStatus, Res, Header } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { Role, Roles } from 'utils/roles';
 import { VoiceDTO } from './dto/voice.dto';
 import { VoiceEntity } from './entities/voice.entity';
@@ -25,18 +26,27 @@ export class VoicesController {
   }
 
   @Get(':vid')
-  loadFile(@Param('vid') vid: string) {
-    
+  @Header('Content-Type', 'audio/wav')
+  async loadFile(
+    @Res({passthrough: true}) res: Response, 
+    @Param('vid') vid: string): Promise<void> {
+
+    const stream = await this.voicesService.loadFile(Number.parseInt(vid));
+    stream.pipe(res);
   }
 
   @Get(':vid')
-  findOne(@Param('name') name: string, @Param('vid') vid: string) {
-
+  async findOne(@Param('vid') vid: string): Promise<VoiceDTO> {
+    const voice_entity = await this.voicesService.findOne(Number.parseInt(vid));
+    return {
+      id: voice_entity.id, 
+      path: voice_entity.path
+    }
   }
 
   @Delete(':vid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('name') name: string, @Param('vid') vid: string) {
-
+  remove(@Param('vid') vid: string): Promise<void> {
+    return this.voicesService.remove(Number.parseInt(vid))
   }
 }

@@ -22,8 +22,8 @@ export class UsersService {
         this.users.create({name, password, role});
     }
 
-    remove(name: string): void {
-        this.users.delete({name});
+    async remove(name: string): Promise<void> {
+        await this.users.delete({name});
     }
 
     async setRole(name: string, role: Roles): Promise<void> {

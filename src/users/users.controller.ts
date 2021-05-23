@@ -39,7 +39,7 @@ export class UsersController {
 
   @Delete(':name/speaker')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('name') name: string): void {
-    this.userService.remove(name);
+  remove(@Param('name') name: string): Promise<void> {
+    return this.userService.remove(name);
   }
 }
