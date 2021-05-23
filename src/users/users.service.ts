@@ -18,8 +18,8 @@ export class UsersService {
         return await this.users.findOne(name);
     }
 
-    create(name: string, password: string, role: Roles): void {
-        this.users.create({name, password, role});
+    create(name: string, password: string, role: Roles): string {
+        return this.users.create({name, password, role}).name;
     }
 
     async remove(name: string): Promise<void> {

@@ -13,7 +13,7 @@ export class VoicesService {
     private usersService: UsersService,
     @Inject('VOICE_ENTITY') private voices: Repository<VoiceEntity>) {}
 
-  async create(name: string, files: Express.Multer.File[]): Promise<void> {
+  async create(name: string, file: Express.Multer.File): Promise<number> {
     const data_path = path.join('data', 'voices', name);
 
     // create user voice directory if not exists
@@ -24,17 +24,18 @@ export class VoicesService {
     }
 
     const base_name = Date.now().toString();
+    const index = Math.round(Math.random()* Number.MAX_VALUE);
     const owner_entity = await this.usersService.findOne(name);
 
-    await Promise.all(files.map(async (file, index) => {
-      const fpath = path.join(data_path, `${base_name}_${index}`);
-      await fs.writeFile(fpath, file.buffer);
-      this.voices.create({
-        path: fpath, 
-        owner: owner_entity, 
-        speaker: owner_entity.speaker
-      });
-    }));
+    
+    const fpath = path.join(data_path, `${base_name}_${index}`);
+    await fs.writeFile(fpath, file.buffer);
+
+    return this.voices.create({
+      path: fpath, 
+      owner: owner_entity, 
+      speaker: owner_entity.speaker
+    }).id;
   }
 
   async findAll(name: string): Promise<VoiceEntity[]> {

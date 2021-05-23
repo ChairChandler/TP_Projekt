@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Delete, UseInterceptors, UploadedFiles, HttpCode, HttpStatus, Res, Header } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UseInterceptors, HttpCode, HttpStatus, Res, Header, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { Role, Roles } from 'utils/roles';
@@ -13,10 +13,12 @@ export class VoicesController {
 
   @Post()
   @UseInterceptors(FileInterceptor('files'))
-  create(@Param('name') name: string, 
-    @UploadedFiles() files: Express.Multer.File[]): Promise<void> {
+  async create(@Res({passthrough: true}) res: Response,
+    @Param('name') name: string, 
+    @UploadedFile() file: Express.Multer.File): Promise<void> {
 
-    return this.voicesService.create(name, files);
+    const id = await this.voicesService.create(name, file);
+    res.location(id.toString());
   }
 
   @Get()

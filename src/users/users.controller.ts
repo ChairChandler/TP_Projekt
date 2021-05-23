@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { Role, Roles } from 'utils/roles';
 import { UserDTO } from './dto/user.dto';
 import { UserEntity } from './entities/user.entity';
@@ -10,8 +11,11 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Post()
-  add(@Body() user: UserDTO): void {
-    this.userService.create(user.name, user.password, user.role);
+  add(@Res({passthrough: true}) res: Response,
+    @Body() user: UserDTO): void {
+
+    const name = this.userService.create(user.name, user.password, user.role);
+    res.location(name);
   }
 
   @Get()
