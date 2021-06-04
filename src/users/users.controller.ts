@@ -1,12 +1,15 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
+import { RolesGuard } from 'src/roles.guard';
+import { TokenGuard } from 'src/token.guard';
 import { Role, Roles } from 'utils/roles';
 import { UserDTO } from './dto/user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
-@Controller('users')
+@Controller('api/users')
 @Role([Roles.HEAD_ADMIN])
+@UseGuards(TokenGuard, RolesGuard)
 export class UsersController {
   constructor(private userService: UsersService) {}
 

@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Param, Delete, UseInterceptors, HttpCode, HttpStatus, Res, Header, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UseInterceptors, HttpCode, HttpStatus, Res, Header, UploadedFile, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { RolesGuard } from 'src/roles.guard';
+import { TokenGuard } from 'src/token.guard';
 import { Role, Roles } from 'utils/roles';
 import { VoiceDTO } from './dto/voice.dto';
 import { VoiceEntity } from './entities/voice.entity';
 import { VoicesService } from './voices.service';
 
-@Controller('users/:name/voices')
+@Controller('api/users/:name/voices')
 @Role([Roles.HEAD_ADMIN, Roles.ADMIN])
+@UseGuards(TokenGuard, RolesGuard)
 export class VoicesController {
   constructor(private readonly voicesService: VoicesService) {}
 
