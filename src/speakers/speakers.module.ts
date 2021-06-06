@@ -4,6 +4,7 @@ import { SpeakersController } from './speakers.controller';
 import { UsersModule } from 'src/users/users.module';
 import { Database } from 'utils/db_conn';
 import { SpeakerEntity } from './entities/speaker.entity';
+import { TokensModule } from 'src/users/tokens/tokens.module';
 
 @Module({
   imports: [forwardRef(() => UsersModule)],

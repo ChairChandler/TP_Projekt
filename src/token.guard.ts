@@ -1,18 +1,18 @@
-import { Injectable, CanActivate, ExecutionContext, HttpStatus } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
-import { AppService } from './app.service';
+import { TokensService } from './users/tokens/tokens.service';
 
 @Injectable()
 export class TokenGuard implements CanActivate {
-  constructor(private appService: AppService) {}
+  constructor(private tokenService: TokensService) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const userToken = request.cookies['token'];
-    if(this.appService.isLogged(userToken)) {
+    if(await this.tokenService.isLogged(userToken)) {
       return true;
     } else {
-      request.res.status(HttpStatus.UNAUTHORIZED).location('/').send();
+      request.res.location('/');
       return false;
     }
   }

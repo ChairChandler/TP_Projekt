@@ -4,10 +4,11 @@ import { VoicesController } from './voices.controller';
 import { Database } from 'utils/db_conn';
 import { VoiceEntity } from './entities/voice.entity';
 import { UsersModule } from '../users.module';
+import { TokensModule } from '../tokens/tokens.module';
 
 @Module({
   // circular dependencies fix
-  imports: [forwardRef(() => UsersModule)],
+  imports: [forwardRef(() => UsersModule), forwardRef(() => TokensModule)],
   controllers: [VoicesController],
   providers: [
     VoicesService,

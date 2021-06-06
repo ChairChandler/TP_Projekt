@@ -11,6 +11,6 @@ export class UserDTO {
     password: string;
 
     @IsOptional()
-    @IsIn([Roles.ADMIN, Roles.USER])
-    role: Roles = Roles.USER;
+    @IsIn([Roles.ADMIN])
+    role: Roles;
 }

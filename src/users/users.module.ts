@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SpeakerEntity } from 'src/speakers/entities/speaker.entity';
 import { Database } from 'utils/db_conn';
 import { UserEntity } from './entities/user.entity';
+import { TokensModule } from './tokens/tokens.module';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { VoicesModule } from './voices/voices.module';
 
 @Module({
-    imports: [VoicesModule],
+    imports: [VoicesModule, forwardRef(() => TokensModule)],
     controllers: [UsersController],
     providers: [
         UsersService,
