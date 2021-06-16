@@ -12,7 +12,6 @@ export class TokenGuard implements CanActivate {
     if(await this.tokenService.isLogged(userToken)) {
       return true;
     } else {
-      request.res.location('/');
       return false;
     }
   }

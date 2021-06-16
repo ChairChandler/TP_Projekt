@@ -29,6 +29,7 @@ export class SpeakersService {
             owner: owner_entity, 
             voices: owner_entity.voices
         });
+        this.speaker.save(new_entity);
 
         return new_entity.id;
     }
@@ -36,8 +37,7 @@ export class SpeakersService {
     private sendPaths(script: ps.ChildProcessWithoutNullStreams, voices: VoiceEntity[]): void {
         for(const voice of voices) {
             if(!script.stdin.write(voice.path)) {
-                console.error('Transmission to subprocess error');
-                throw new InternalServerErrorException();
+                throw new InternalServerErrorException('Transmission to subprocess error');
             }
         }
     }
@@ -49,8 +49,7 @@ export class SpeakersService {
         });
         
         if(!exit_code) {
-            console.error(`Invalid subprocess exit code: ${exit_code}`);
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(`Invalid subprocess exit code: ${exit_code}`);
         }
     }
 
@@ -59,8 +58,7 @@ export class SpeakersService {
         
         const script = ps.spawn('python3', [SpeakersService.TEST_SPEAKER_SCRIPT]);
         if(!script.stdin.write(speaker.model_path)) {
-            console.error('Transmission to subprocess error');
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException('Transmission to subprocess error');
         }
 
         try {
@@ -75,8 +73,7 @@ export class SpeakersService {
                 script.on('error', reject);
             })
         } catch(e) {
-            console.error(e);
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(e.message);
         }
     }
 }

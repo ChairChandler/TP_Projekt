@@ -16,7 +16,7 @@ export class Database {
                 UserEntity, VoiceEntity, SpeakerEntity, TokenEntity
             ],
             synchronize: true, // TODO: !! USUNAC W PRODUKCJI
-            logging: false
+            logging: false,
           });
     }
 }

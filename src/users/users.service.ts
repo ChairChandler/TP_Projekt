@@ -19,7 +19,8 @@ export class UsersService {
     }
 
     create(name: string, password: string, role: Roles): string {
-        return this.users.create({name, password, role}).name;
+        const entity = this.users.create({name, password, role});
+        return entity.name;
     }
 
     async remove(name: string): Promise<void> {
@@ -28,15 +29,13 @@ export class UsersService {
 
     async setRole(name: string, role: Roles): Promise<void> {
         if(role == Roles.HEAD_ADMIN) {
-            console.error('Set HEAD_ADMIN role forbidden');
-            throw new ForbiddenException();
+            throw new ForbiddenException('Set HEAD_ADMIN role forbidden');
         }
       
         const user: UserEntity = await this.findOne(name);
 
         if(user.role == Roles.HEAD_ADMIN) {
-            console.error('Change HEAD_ADMIN role forbidden');
-            throw new ForbiddenException();
+            throw new ForbiddenException('Change HEAD_ADMIN role forbidden');
         }
       
         this.users.update(name, {role});

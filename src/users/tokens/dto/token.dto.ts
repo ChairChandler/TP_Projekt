@@ -2,6 +2,6 @@ import { IsAlphanumeric, Length } from "class-validator";
 
 export class TokenDTO {
     @IsAlphanumeric()
-    @Length(8, 16)
+    @Length(1, 16)
     password: string;
 }

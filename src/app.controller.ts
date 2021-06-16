@@ -9,9 +9,9 @@ export class AppController {
   @Get()
   getLoginPage(@Req() req: Request, @Res() res: Response): void {
     if(req.cookies['token']) {
-      res.status(HttpStatus.PERMANENT_REDIRECT).location('/user');
+      res.status(HttpStatus.SEE_OTHER).location('/user').send();
     } else {
-      return res.render('login.hbs');
+      res.render('login.hbs');
     }
   }
 
