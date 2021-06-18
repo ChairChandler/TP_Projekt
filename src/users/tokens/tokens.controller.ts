@@ -13,18 +13,15 @@ export class TokensController {
     @Body() body: TokenDTO): Promise<void> {
 
     const user = await this.tokensService.signIn(name, body.password);
-    
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 1); // next day
 
     res.status(HttpStatus.SEE_OTHER)
     .cookie('token', user.token, {
-      httpOnly: true, expires
+      httpOnly: true, expires: user.expires
     }).cookie('role', user.role, {
-      httpOnly: true, expires
+      httpOnly: true, expires: user.expires
     }).location('/user');
 
-    this.tokensService.createSignOutTask(expires, user.token);
+    this.tokensService.createSignOutTask(user.expires, user.token);
   }
 
   @Delete('api/users/token')

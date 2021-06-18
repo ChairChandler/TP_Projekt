@@ -8,7 +8,10 @@ import { TokensModule } from '../tokens/tokens.module';
 
 @Module({
   // circular dependencies fix
-  imports: [forwardRef(() => UsersModule), forwardRef(() => TokensModule)],
+  imports: [
+    forwardRef(() => UsersModule), 
+    forwardRef(() => TokensModule)
+  ],
   controllers: [VoicesController],
   providers: [
     VoicesService,

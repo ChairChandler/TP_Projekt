@@ -8,7 +8,10 @@ import { UsersService } from './users.service';
 import { VoicesModule } from './voices/voices.module';
 
 @Module({
-    imports: [VoicesModule, forwardRef(() => TokensModule)],
+    imports: [
+        forwardRef(() => VoicesModule), 
+        forwardRef(() => TokensModule)
+    ],
     controllers: [UsersController],
     providers: [
         UsersService,

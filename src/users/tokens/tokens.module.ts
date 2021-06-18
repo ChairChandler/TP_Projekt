@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { Database } from 'utils/db_conn';
 import { UsersModule } from '../users.module';
 import { TokenEntity } from './entities/token.entity';
@@ -6,7 +6,7 @@ import { TokensController } from './tokens.controller';
 import { TokensService } from './tokens.service';
 
 @Module({
-  imports: [UsersModule],
+  imports: [forwardRef(() => UsersModule)],
   controllers: [TokensController],
   providers: [
     TokensService,

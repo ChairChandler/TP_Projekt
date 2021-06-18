@@ -1,5 +1,5 @@
 import { UserEntity } from "src/users/entities/user.entity";
-import { Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 
 @Entity('token')
 export class TokenEntity {
@@ -9,6 +9,9 @@ export class TokenEntity {
         length: 32
     })
     token: string;
+
+    @Column({type: 'datetime'})
+    expires: Date;
 
     @OneToOne(() => UserEntity, {
         onDelete: 'CASCADE'

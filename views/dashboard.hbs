@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Speaker Recognition System</title>
+    <meta name="author" content="Adam Lewandowski">
+    <meta name="description" content="Speaker Recognition System makes easier to identify speakers from the group.">
+    <meta name="keywords" content="Speaker, Recognition, System, ML">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/global.css">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar 
+        navbar-expand navbar-dark bg-primary justify-content-between">
+            <ul class="navbar-nav mr-auto">
+                {{#equal page_role 'user'}}
+                    <li class="nav-item">
+                        <a href="user" class="nav-link active">User dashboard</a>
+                    </li>
+                    {{#equal user_info.admin true}}
+                        <li class="nav-item">
+                            <a href="admin" class="nav-link">Admin dashboard</a>
+                        </li>
+                    {{/equal}}
+                    {{#equal user_info.head_admin true}}
+                        <li class="nav-item">
+                            <a href="head_admin" class="nav-link">Head admin dashboard</a>
+                        </li>
+                    {{/equal}}
+                {{/equal}}
+                {{#equal page_role 'admin'}}
+                    <li class="nav-item">
+                        <a href="user" class="nav-link">User dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin" class="nav-link active">Admin dashboard</a>
+                    </li>
+                    {{#equal user_info.head_admin true}}
+                        <li class="nav-item">
+                            <a href="head_admin" class="nav-link">Head admin dashboard</a>
+                        </li>
+                    {{/equal}}
+                {{/equal}}
+                {{#equal page_role 'head_admin'}}
+                    <li class="nav-item">
+                        <a href="user" class="nav-link">User dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin" class="nav-link">Admin dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="head_admin" class="nav-link active">Head admin dashboard</a>
+                    </li>
+                {{/equal}}
+            </ul>
+
+            <button id="logout" class="btn btn-secondary">Logout</button>
+        </nav>
+    </header>
+
+    <main>
+        {{#equal page_role 'user'}}
+            <ul>
+            {{#each speakersBase}}
+                <li>
+                    <div data-sid="{{this.sid}}">{{this.uid}}</div>
+                    {{!-- Testowanie speakera --}}
+                </li>
+            {{/each}}
+            </ul>
+
+        {{/equal}}
+
+        {{#equal page_role 'admin'}}
+            <ul>
+            {{#each speakersAdvanced}}
+                <li>
+                    <div data-sid="{{this.sid}}">{{this.uid}}</div>
+                    {{#each this.file_names}}
+                        <div>{{this}}</div>
+                        {{!-- Tworzenie/Usuwanie plików speakera--}}
+                    {{/each}}
+                </li>
+            {{/each}}
+            </ul>
+            {{!-- Tworzenie/Usuwanie speakera --}}
+            {{!-- datalist!!! --}}
+            <form>
+                <div class="mb-3">
+                    <label for="files" class="form-label">Samples</label>
+                    <input class="form-control" type="file" id="files" accept=".wav" multiple>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        {{/equal}}
+
+        {{#equal page_role 'head_admin'}}
+            <div class="mb-5" id="mode-selection">
+                <button class="btn btn-primary" data-target="#user-creation">
+                    Create
+                </button>
+                <button class="btn btn-primary" data-target="#user-edition">
+                    Edit
+                </button>
+                <button class="btn btn-primary" data-target="#user-deletion">
+                    Delete
+                </button>
+            </div>
+
+            <form id="user-creation" class="card card-body">
+                <fieldset>
+                    <legend>Creation</legend>
+                    <div class="form-group">
+                        <label for="user-creation-username" class="form-label">User</label>
+                        <input type="text" id="user-creation-username" class="form-control" required minlength="8" maxlength="16">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user-creation-role" class="form-label">Role</label>
+                        <select class="form-control" id="user-creation-role" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="head_admin">Head admin</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label for="user-creation-password">Password</label>
+                        <input type="password" class="form-control" id="user-creation-password" required minlength="8" maxlength="16">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </fieldset>
+            </form>
+
+            <form id="user-edition" class="card card-body">
+                <fieldset>
+                    <legend>Edition</legend>
+                    <div class="form-group">
+                        <label for="user-edition-username" class="form-label">User</label>
+                        <select class="form-control" id="user-edition-username">
+                            <option value="" selected disabled hidden>Choose here</option>
+                            {{#each users}}
+                                <option value="{{this.name}}">{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user-edition-role" class="form-label">Role</label>
+                        <select class="form-control" id="user-edition-role">
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="HEAD_ADMIN">Head admin</option>
+                        </select>
+                    </div>
+
+                    <div id="usersList">
+                        {{#each users}}
+                            <div data-name="{{this.name}}" data-role="{{this.role}}"></div>
+                        {{/each}}
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="password-change">
+                        <label class="form-check-label" for="password-change">Change password</label>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label for="user-edition-password">Password</label>
+                        <input type="password" class="form-control" disabled id="user-edition-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-secondary" id="user-edition-reset">Reset</button>
+                </fieldset>
+            </form>
+
+            <form id="user-deletion" class="card card-body">
+                <fieldset>
+                    <legend>Deletion</legend>
+                    <div class="form-group">
+                        <label for="user-deletion-username" class="form-label">User</label>
+                        <select class="form-control" id="user-deletion-username">
+                            <option value="" selected disabled hidden>Choose here</option>
+                            {{#each users}}
+                                <option value="{{this.name}}">{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </fieldset>
+            </form>
+
+            {{!-- Tworzenie/Usuwanie użytkownika --}}
+        {{/equal}}
+    </main>
+
+    <footer>
+
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+    {{#equal page_role 'user'}}
+        <script type="module" src="scripts/user.js" defer></script>
+    {{/equal}}
+    {{#equal page_role 'admin'}}
+        <script type="module" src="scripts/admin.js" defer></script>
+    {{/equal}}
+    {{#equal page_role 'head_admin'}}
+        <script type="module" src="scripts/head_admin.js" defer></script>
+    {{/equal}}
+</body>
+
+</html>

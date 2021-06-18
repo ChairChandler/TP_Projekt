@@ -3,7 +3,8 @@ import { Response } from 'express';
 import { RolesGuard } from 'src/roles.guard';
 import { TokenGuard } from 'src/token.guard';
 import { Role, Roles } from 'utils/roles';
-import { UserDTO } from './dto/user.dto';
+import { UserAdvancedDTO } from './dto/userAdvanced.dto';
+import { UserBaseDTO } from './dto/userBase';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -15,20 +16,20 @@ export class UsersController {
 
   @Post()
   add(@Res({passthrough: true}) res: Response,
-    @Body() user: UserDTO): void {
+    @Body() user: UserAdvancedDTO): void {
 
     const name = this.userService.create(user.name, user.password, user.role);
     res.location(name);
   }
 
   @Get()
-  async getAll(): Promise<UserDTO[]> {
-    const data: UserEntity[] = await this.userService.getAll()
-    return data.map(d => ({name: d.name, password: d.password, role: d.role}));
+  async getAll(): Promise<UserBaseDTO[]> {
+    const data: UserEntity[] = await this.userService.getAll();
+    return data.map(d => ({name: d.name, role: d.role}));
   }
 
   @Get(':name')
-  getOne(@Param('name') name: string): Promise<UserDTO> {
+  getOne(@Param('name') name: string): Promise<UserBaseDTO> {
     return this.userService.findOne(name);
   }
 

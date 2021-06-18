@@ -76,4 +76,20 @@ export class SpeakersService {
             throw new InternalServerErrorException(e.message);
         }
     }
+
+    async getSpeakers(advanced = false): Promise<{sid: number, uid: string, file_names?: string[]}[]> {
+        const speakers = await this.speaker.find();
+        if(advanced) {
+            return speakers.map(s => {
+                const paths = s.voices.map(v => path.basename(v.path));
+                return {
+                    sid: s.id, 
+                    uid: s.owner.name, 
+                    file_names: paths
+                };
+            });
+        } else {
+            return speakers.map(s => ({sid: s.id, uid: s.owner.name}));
+        }
+    }
 }

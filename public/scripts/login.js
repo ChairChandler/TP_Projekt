@@ -1,3 +1,5 @@
+import './bootstrap-msg.js';
+
 /**
  * @type {HTMLFormElement}
  */
@@ -23,10 +25,11 @@ form.addEventListener('submit', async ev => {
             password: password.value
         })
     });
-
+    
     if(!response.ok) {
         const js = await response.json();
-        alert(js.message);
+        // @ts-ignore
+        Msg.error(js.message);
     }
 
     if(response.redirected) {
