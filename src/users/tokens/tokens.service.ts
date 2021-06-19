@@ -5,6 +5,7 @@ import * as crypto from 'crypto';
 import { UserEntity } from '../entities/user.entity';
 import { Roles } from 'utils/roles';
 import * as schedule from 'node-schedule';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class TokensService {
@@ -22,7 +23,8 @@ export class TokensService {
   }
 
   async signIn(name: string, password: string): Promise<{token: string, role: Roles, expires: Date}> {
-    const user = await this.users.findOne({name, password});
+    const password_hash = this.createHash(password);
+    const user = await this.users.findOne({name, password_hash});
 
     if(user) {
       const token = crypto.randomBytes(32).toString();
@@ -32,7 +34,7 @@ export class TokensService {
       const created_entity = this.tokens.create({user, token, expires});
       
       try {
-        await this.tokens.save(created_entity);
+        await this.tokens.insert(created_entity);
         return {token, role: user.role, expires};
       } catch(e) {
         throw new InternalServerErrorException('User already logged');
@@ -67,5 +69,9 @@ export class TokensService {
 
   cancelSignOutTask(token: string) {
     this.tasks.delete(token);
+  }
+
+  private createHash(txt: string) {
+    return createHash('sha256').update(txt).digest('hex');
   }
 }

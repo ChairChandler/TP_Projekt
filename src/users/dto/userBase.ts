@@ -7,6 +7,12 @@ export class UserBaseDTO {
     name: string;
 
     @IsOptional()
-    @IsIn([Roles.ADMIN])
+    @IsIn([Roles.USER, Roles.ADMIN, Roles.HEAD_ADMIN])
+    role: Roles;
+}
+
+export class UserBaseEditDTO {
+    @IsOptional()
+    @IsIn([Roles.USER, Roles.ADMIN, Roles.HEAD_ADMIN])
     role: Roles;
 }

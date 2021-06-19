@@ -29,6 +29,8 @@ export class VoicesService {
       speaker: owner_entity.speaker
     });
 
+    await this.voices.insert(new_entity);
+
     return new_entity.id;
   }
 

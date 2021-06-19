@@ -29,7 +29,7 @@ export class SpeakersService {
             owner: owner_entity, 
             voices: owner_entity.voices
         });
-        this.speaker.save(new_entity);
+        await this.speaker.insert(new_entity);
 
         return new_entity.id;
     }

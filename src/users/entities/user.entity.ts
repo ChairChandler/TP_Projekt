@@ -13,10 +13,10 @@ export class UserEntity {
     name: string;
 
     @Column('varchar', {
-        name: 'password',
-        length: 16
+        name: 'password_hash',
+        length: 64
     })
-    password: string;
+    password_hash: string;
 
     @Column('varchar', {
         name: 'role',

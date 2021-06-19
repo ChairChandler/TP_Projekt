@@ -18,3 +18,11 @@ header {
     position: sticky;
     top: 0;
 }
+
+.forms-collapse > form.hidden {
+    display: none;
+}
+
+.forms-collapse > form {
+    display: block;
+}

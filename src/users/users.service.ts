@@ -1,8 +1,9 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SpeakerEntity } from 'src/speakers/entities/speaker.entity';
 import { Repository } from 'typeorm';
 import { Roles } from 'utils/roles';
 import { UserEntity } from './entities/user.entity';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -18,31 +19,45 @@ export class UsersService {
         return await this.users.findOne(name);
     }
 
-    create(name: string, password: string, role: Roles): string {
-        const entity = this.users.create({name, password, role});
-        return entity.name;
+    async create(name: string, password: string, role: Roles): Promise<string> {
+        try {
+            const entity = this.users.create({name, password_hash: this.createHash(password), role});
+            await this.users.insert(entity);
+            return entity.name;
+        } catch(e) {
+            throw new BadRequestException('User exists');
+        }
     }
 
     async remove(name: string): Promise<void> {
+        const user: UserEntity = await this.findOne(name);
+        if(user.role == Roles.HEAD_ADMIN) {
+            throw new ForbiddenException('Delete HEAD_ADMIN user forbidden');
+        }
+
         await this.users.delete({name});
     }
 
     async setRole(name: string, role: Roles): Promise<void> {
-        if(role == Roles.HEAD_ADMIN) {
-            throw new ForbiddenException('Set HEAD_ADMIN role forbidden');
-        }
-      
         const user: UserEntity = await this.findOne(name);
 
         if(user.role == Roles.HEAD_ADMIN) {
             throw new ForbiddenException('Change HEAD_ADMIN role forbidden');
         }
       
-        this.users.update(name, {role});
+        await this.users.update(name, {role});
+    }
+
+    async setPassword(name: string, password: string): Promise<void> {
+        await this.users.update(name, {password_hash: password});
     }
 
     async setSpeaker(name: string, speaker: number): Promise<void> {
         const user_s: SpeakerEntity = await this.speakers.findOne(speaker);
-        this.users.update(name, {speaker: user_s});
+        await this.users.update(name, {speaker: user_s});
+    }
+
+    private createHash(txt: string) {
+        return createHash('sha256').update(txt).digest('hex');
     }
 }

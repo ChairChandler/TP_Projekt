@@ -100,107 +100,115 @@
         {{/equal}}
 
         {{#equal page_role 'head_admin'}}
-            <div class="mb-5" id="mode-selection">
-                <button class="btn btn-primary" data-target="#user-creation">
-                    Create
-                </button>
-                <button class="btn btn-primary" data-target="#user-edition">
-                    Edit
-                </button>
-                <button class="btn btn-primary" data-target="#user-deletion">
-                    Delete
-                </button>
+            <div class="mb-5 mode-selection">
+                <a href="#user-creation">
+                    <button class="btn btn-primary">
+                        Create
+                    </button>
+                </a>
+
+                <a href="#user-edition">
+                    <button class="btn btn-primary">
+                        Edit
+                    </button>
+                </a>
+
+                <a href="#user-deletion">
+                    <button class="btn btn-primary">
+                        Delete
+                    </button>
+                </a>
             </div>
 
-            <form id="user-creation" class="card card-body">
-                <fieldset>
-                    <legend>Creation</legend>
-                    <div class="form-group">
-                        <label for="user-creation-username" class="form-label">User</label>
-                        <input type="text" id="user-creation-username" class="form-control" required minlength="8" maxlength="16">
-                    </div>
+            <div class="forms-collapse">
+                <form id="user-creation" class="card card-body">
+                    <fieldset>
+                        <legend>Creation</legend>
+                        <div class="form-group">
+                            <label for="user-creation-username" class="form-label">User</label>
+                            <input type="text" id="user-creation-username" class="form-control" required minlength="8" maxlength="16">
+                        </div>
 
-                    <div class="form-group">
-                        <label for="user-creation-role" class="form-label">Role</label>
-                        <select class="form-control" id="user-creation-role" required>
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                            <option value="head_admin">Head admin</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="user-creation-role" class="form-label">Role</label>
+                            <select class="form-control" id="user-creation-role" required>
+                                <option value="USER" selected>User</option>
+                                <option value="ADMIN">Admin</option>
+                                <option value="HEAD_ADMIN">Head admin</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group mt-3">
-                        <label for="user-creation-password">Password</label>
-                        <input type="password" class="form-control" id="user-creation-password" required minlength="8" maxlength="16">
-                    </div>
+                        <div class="form-group mt-3">
+                            <label for="user-creation-password">Password</label>
+                            <input type="password" class="form-control" id="user-creation-password" required minlength="8" maxlength="16">
+                        </div>
 
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <button type="reset" class="btn btn-secondary">Reset</button>
-                </fieldset>
-            </form>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </fieldset>
+                </form>
 
-            <form id="user-edition" class="card card-body">
-                <fieldset>
-                    <legend>Edition</legend>
-                    <div class="form-group">
-                        <label for="user-edition-username" class="form-label">User</label>
-                        <select class="form-control" id="user-edition-username">
-                            <option value="" selected disabled hidden>Choose here</option>
+                <form id="user-edition" class="card card-body">
+                    <fieldset>
+                        <legend>Edition</legend>
+                        <div class="form-group">
+                            <label for="user-edition-username" class="form-label">User</label>
+                            <select class="form-control" id="user-edition-username" required>
+                                <option value="" selected disabled hidden>Choose here</option>
+                                {{#each users}}
+                                    <option value="{{this.name}}">{{this.name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="user-edition-role" class="form-label">Role</label>
+                            <select class="form-control" id="user-edition-role">
+                                <option value="USER">User</option>
+                                <option value="ADMIN">Admin</option>
+                                <option value="HEAD_ADMIN">Head admin</option>
+                            </select>
+                        </div>
+
+                        <div id="usersList">
                             {{#each users}}
-                                <option value="{{this.name}}">{{this.name}}</option>
+                                <div data-name="{{this.name}}" data-role="{{this.role}}"></div>
                             {{/each}}
-                        </select>
-                    </div>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="user-edition-role" class="form-label">Role</label>
-                        <select class="form-control" id="user-edition-role">
-                            <option value="USER">User</option>
-                            <option value="ADMIN">Admin</option>
-                            <option value="HEAD_ADMIN">Head admin</option>
-                        </select>
-                    </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="password-change">
+                            <label class="form-check-label" for="password-change">Change password</label>
+                        </div>
 
-                    <div id="usersList">
-                        {{#each users}}
-                            <div data-name="{{this.name}}" data-role="{{this.role}}"></div>
-                        {{/each}}
-                    </div>
+                        <div class="form-group mt-3">
+                            <label for="user-edition-password">Password</label>
+                            <input type="password" class="form-control" disabled id="user-edition-password">
+                        </div>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="password-change">
-                        <label class="form-check-label" for="password-change">Change password</label>
-                    </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="reset" class="btn btn-secondary" id="user-edition-reset">Reset</button>
+                    </fieldset>
+                </form>
 
-                    <div class="form-group mt-3">
-                        <label for="user-edition-password">Password</label>
-                        <input type="password" class="form-control" disabled id="user-edition-password">
-                    </div>
+                <form id="user-deletion" class="card card-body">
+                    <fieldset>
+                        <legend>Deletion</legend>
+                        <div class="form-group">
+                            <label for="user-deletion-username" class="form-label">User</label>
+                            <select class="form-control" id="user-deletion-username" required>
+                                <option value="" selected disabled hidden>Choose here</option>
+                                {{#each users}}
+                                    <option value="{{this.name}}">{{this.name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
 
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <button type="reset" class="btn btn-secondary" id="user-edition-reset">Reset</button>
-                </fieldset>
-            </form>
-
-            <form id="user-deletion" class="card card-body">
-                <fieldset>
-                    <legend>Deletion</legend>
-                    <div class="form-group">
-                        <label for="user-deletion-username" class="form-label">User</label>
-                        <select class="form-control" id="user-deletion-username">
-                            <option value="" selected disabled hidden>Choose here</option>
-                            {{#each users}}
-                                <option value="{{this.name}}">{{this.name}}</option>
-                            {{/each}}
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <button type="reset" class="btn btn-secondary">Reset</button>
-                </fieldset>
-            </form>
-
-            {{!-- Tworzenie/Usuwanie użytkownika --}}
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </fieldset>
+                </form>
+            </div>
         {{/equal}}
     </main>
 
@@ -217,15 +225,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+    <script src="scripts/pages/global.js" defer></script>
 
     {{#equal page_role 'user'}}
-        <script type="module" src="scripts/user.js" defer></script>
+        <script type="module" src="scripts/pages/user.js" defer></script>
     {{/equal}}
     {{#equal page_role 'admin'}}
-        <script type="module" src="scripts/admin.js" defer></script>
+        <script type="module" src="scripts/pages/admin.js" defer></script>
     {{/equal}}
     {{#equal page_role 'head_admin'}}
-        <script type="module" src="scripts/head_admin.js" defer></script>
+        <script type="module" src="scripts/pages/head_admin.js" defer></script>
     {{/equal}}
 </body>
 
