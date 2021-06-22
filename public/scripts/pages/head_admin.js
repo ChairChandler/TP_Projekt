@@ -4,35 +4,42 @@ class AppUserCreationForm extends AppForm {
     constructor() {
         const form = document.querySelector('#user-creation');
         super(form);
+        this.getInputs();
+        this.registerMetaDeliver(() => this.metaDeliver());
+    }
 
+    getInputs() {
         /**
          * @type {HTMLInputElement}
          */
         this.username = document.querySelector('#user-creation-username');
+                
         /**
-         * @type {HTMLSelectElement}
-         */
+        * @type {HTMLSelectElement}
+        */
         this.role = document.querySelector('#user-creation-role');
+                 
         /**
-         * @type {HTMLInputElement}
-         */
+        * @type {HTMLInputElement}
+        */
         this.password = document.querySelector('#user-creation-password');
     }
 
-    get url() {
-        return 'api/users';
-    }
-
-    get method() {
-        return 'POST';
-    }
-
-    get body() {
+    metaDeliver() {
         return {
-            name: this.username.value,
-            password: this.password.value,
-            role: this.role.value
-        };
+            activate: true,
+            url: 'api/users',
+            method: 'POST',
+            body: {
+                name: this.username.value,
+                password: this.password.value,
+                role: this.role.value
+            },
+            bodyType: 'JSON',
+            reload: true,
+            redirect: false,
+            showSuccessMsg: true
+        }
     }
 }
 
@@ -40,6 +47,7 @@ class AppUserEditionForm extends AppForm {
     constructor() {
         const form = document.querySelector('#user-edition');
         super(form);
+        this.registerMetaDeliver(() => this.metaDeliver());
 
         /**
          * @type {{name, role}[]}
@@ -50,47 +58,59 @@ class AppUserEditionForm extends AppForm {
             return {name, role};
         });
 
+        this.getInputs();
+
+        this.selectedUser.addEventListener('change', e => this.onChangeUsername(e));
+        document.querySelector('#user-edition-reset').addEventListener('click', () => this.onReset());
+        document.querySelector('#password-change').addEventListener('change', e => this.onPasswordChangeCheck(e))
+    }
+
+    getInputs() {
         /**
          * @type {HTMLSelectElement}
          */
         this.selectedUser = document.querySelector('#user-edition-username');
-        this.selectedUser.addEventListener('change', e => this.onChangeUsername(e));
-
+        
         /**
          * @type {HTMLSelectElement}
          */
         this.selectedRole = document.querySelector('#user-edition-role');
-        document.querySelector('#user-edition-reset').addEventListener('click', () => this.onReset());
-
+        
         /**
          * @type {HTMLInputElement}
          */
         this.newPassword = document.querySelector('#user-edition-password');
-
-        document.querySelector('#password-change').addEventListener('change', e => this.onPasswordChangeCheck(e))
     }
 
-    get url() {
+    metaDeliver() {
+        let url;
         if(this.passwordCanBeChanged) {
-            return `api/users/${this.selectedUser.value}`;
+            url = `api/users/${this.selectedUser.value}`;
         } else {
-            return `api/users/${this.selectedUser.value}/role`;
+            url = `api/users/${this.selectedUser.value}/role`;
         }
-    }
 
-    get method() {
-        return this.passwordCanBeChanged ? 'PUT' : 'PATCH';
-    }
+        const method = this.passwordCanBeChanged ? 'PUT' : 'PATCH';;
 
-    get body() {
-        console.log(this.passwordCanBeChanged)
         const role = this.selectedRole.value;
         const password = this.newPassword.value;
 
+        let body;
         if(this.passwordCanBeChanged) {
-            return {role, password};
+            body = {role, password};
         } else {
-            return {role};
+            body = {role};
+        }
+
+        return {
+            activate: true,
+            url,
+            method,
+            body,
+            bodyType: 'JSON',
+            reload: true,
+            redirect: false,
+            showSuccessMsg: true
         }
     }
 
@@ -121,27 +141,28 @@ class AppUserDeletionForm extends AppForm {
     constructor() {
         const form = document.querySelector('#user-deletion');
         super(form);
+        this.registerMetaDeliver(() => this.metaDeliver());
+        this.getInputs();
+    }
 
+    getInputs() {
         /**
         * @type {HTMLSelectElement}
         */
-        this.selection = document.querySelector('#user-deletion-username');
+         this.selection = document.querySelector('#user-deletion-username');
     }
 
-    get activate() {
-        return !!this.selection.value;
-    }
-
-    get url() {
-        return `/api/users/${this.selection.value}`;
-    }
-
-    get method() {
-        return 'DELETE';
-    }
-
-    get body() {
-        return null;
+    metaDeliver() {
+        return {
+            activate: !!this.selection.value,
+            url: `/api/users/${this.selection.value}`,
+            method: 'DELETE',
+            body: null,
+            bodyType: null,
+            reload: true,
+            redirect: false,
+            showSuccessMsg: true
+        }
     }
 }
 

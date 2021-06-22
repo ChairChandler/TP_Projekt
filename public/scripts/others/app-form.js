@@ -2,44 +2,61 @@ import './bootstrap-msg.js';
 
 export class AppForm {
     constructor(form) {
-        form.addEventListener('submit', ev => this.#send(ev));
+        this.requestsQueue = [];
+        form.addEventListener('submit', ev => {
+            ev.preventDefault();
+            for(const f of this.requestsQueue) {
+                this.#send(f());
+            }
+        });
     }
 
-    get activate() {
-        return true;
+    /**
+     * @typedef {{
+     * activate, 
+     * url, 
+     * method, 
+     * body, 
+     * bodyType, 
+     * reload, 
+     * redirect,
+     * showSuccessMsg}} Meta //'FILES' | 'JSON'
+     * @param {() => Meta} deliver 
+     */
+    registerMetaDeliver(deliver) {
+        this.requestsQueue.push(deliver);
     }
 
-    get url() {
-        throw new Error('Unimplemented');
-        return null;
-    }
-
-    get method() {
-        throw new Error('Unimplemented');
-        return null;
-    }
-
-    get body() {
-        throw new Error('Unimplemented');
-        return null;
-    }
-
-    async #send(ev) {
-        ev.preventDefault();
-        if(!this.activate) {
+    /**
+     * 
+     * @param {Meta} meta 
+     */
+    async #send(meta) {
+        if(!meta.activate) {
             return;
         }
 
-        const body = this.body;
-        const headers = {"Accept": "application/json"};
-        if(body) {
-            headers["Content-Type"] = "application/json";
+        let body, headers;
+        switch(meta.bodyType) {
+            case 'FILES':
+                headers = {"Content-Type": 'multipart/form-data'};
+                const formData = new FormData();
+                for(const name in meta.body) {
+                    formData.append(name, meta.body);
+                  }
+                body = formData;
+                break;
+
+            case 'JSON':   
+                headers = {"Content-Type": 'application/json'};
+                body = JSON.stringify(meta.body);
+                break;
         }
 
-        const response = await fetch(this.url, {
-            method: this.method,
+        const response = await fetch(meta.url, {
+            method: meta.method,
             headers,
-            body: JSON.stringify(body)
+            body
         });
         
         if(!response.ok) {
@@ -52,9 +69,12 @@ export class AppForm {
             } else {
                 // @ts-ignore
                 Msg.success(response.statusText, 3000);
-                setTimeout(() => {
-                    window.location.href = window.location.href;
-                }, 3000);
+
+                if(meta.reload) {
+                    setTimeout(() => {
+                        window.location.href = window.location.href;
+                    }, 3000);
+                }
             }            
         }
     }

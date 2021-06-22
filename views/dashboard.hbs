@@ -65,41 +65,97 @@
 
     <main>
         {{#equal page_role 'user'}}
-            <ul>
-            {{#each speakersBase}}
-                <li>
-                    <div data-sid="{{this.sid}}">{{this.uid}}</div>
-                    {{!-- Testowanie speakera --}}
-                </li>
-            {{/each}}
-            </ul>
+            <div id="usersList">
+                {{#each users}}
+                    <div data-name="{{this.name}}"></div>
+                {{/each}}
+            </div>
 
+            <div id="speakersList">
+                {{#each speakersBase}}
+                    <div data-sid="{{this.sid}}" data-uid="{{this.uid}}"></div>
+                {{/each}}
+            </div>
+
+            <form id="test-form" class="card card-body">
+                <fieldset>
+                    <legend>Testing sample</legend>
+                    <div class="form-group">
+                        <label for="user" class="form-label">User</label>
+                        <select class="form-control" id="user" required>
+                            <option value="" selected disabled hidden>Choose here</option>
+                            {{#each users}}
+                                <option value="{{this.name}}">{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                
+                    <div class="form-group mb-3">
+                        <label for="files" class="form-label">Sample</label>
+                        <input class="form-control" type="file" id="files" accept=".wav" disabled>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </fieldset>
+            </form>
         {{/equal}}
 
         {{#equal page_role 'admin'}}
-            <ul>
-            {{#each speakersAdvanced}}
-                <li>
-                    <div data-sid="{{this.sid}}">{{this.uid}}</div>
-                    {{#each this.file_names}}
-                        <div>{{this}}</div>
-                        {{!-- Tworzenie/Usuwanie plików speakera--}}
-                    {{/each}}
-                </li>
-            {{/each}}
-            </ul>
-            {{!-- Tworzenie/Usuwanie speakera --}}
-            {{!-- datalist!!! --}}
-            <form>
-                <div class="mb-3">
-                    <label for="files" class="form-label">Samples</label>
-                    <input class="form-control" type="file" id="files" accept=".wav" multiple>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+            <div id="usersList">
+                {{#each users}}
+                    <div data-name="{{this.name}}"></div>
+                {{/each}}
+            </div>
+
+            <div id="speakersList">
+                {{#each files}}
+                    <div data-sid="{{this.sid}}" data-uid="{{this.uid}}">
+                        {{#each this.files}}
+                            <div data-id="{{this.id}}" data-fname="{{this.fname}}"></div>
+                        {{/each}}
+                    </div>
+                {{/each}}
+            </div>
+
+            <form id="model-form" class="card card-body">
+                <fieldset>
+                    <legend>Create/Edit model</legend>
+                    <div class="form-group">
+                        <label for="user" class="form-label">User</label>
+                        <select class="form-control" id="user" required>
+                            <option value="" selected disabled hidden>Choose here</option>
+                            {{#each users}}
+                                <option value="{{this.name}}">{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                
+                    <div class="form-group mb-3">
+                        <label for="files" class="form-label">Add samples</label>
+                        <input class="form-control" type="file" id="files" accept=".wav" multiple disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="samples">Remove samples</label>
+                        <select multiple class="form-control" id="samples" disabled></select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </fieldset>
             </form>
         {{/equal}}
 
         {{#equal page_role 'head_admin'}}
+            <div id="usersList">
+                {{#each users}}
+                    <div data-name="{{this.name}}" data-role="{{this.role}}"></div>
+                {{/each}}
+            </div>
+
             <div class="mb-5 mode-selection">
                 <a href="#user-creation">
                     <button class="btn btn-primary">
@@ -168,12 +224,6 @@
                                 <option value="ADMIN">Admin</option>
                                 <option value="HEAD_ADMIN">Head admin</option>
                             </select>
-                        </div>
-
-                        <div id="usersList">
-                            {{#each users}}
-                                <div data-name="{{this.name}}" data-role="{{this.role}}"></div>
-                            {{/each}}
                         </div>
 
                         <div class="form-check">

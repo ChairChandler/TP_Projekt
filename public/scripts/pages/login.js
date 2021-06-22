@@ -4,29 +4,34 @@ class AppLoginForm extends AppForm {
     constructor() {
         const form = document.querySelector('#login_window');
         super(form);
+        this.getInputs();
+        this.registerMetaDeliver(() => this.metaDeliver());
+    }
 
+    getInputs() {
         /**
          * @type {HTMLInputElement}
          */
-        this.login = document.querySelector('#login');
-        /**
-         * @type {HTMLInputElement}
-         */
-        this.password = document.querySelector('#password');
+         this.login = document.querySelector('#login');
+         /**
+          * @type {HTMLInputElement}
+          */
+         this.password = document.querySelector('#password');
     }
 
-    get url() {
-        return `/api/users/${this.login.value}/token`;
-    }
-
-    get method() {
-        return 'POST';
-    }
-
-    get body() {
+    metaDeliver() {
         return {
-            password: this.password.value
-        };
+            activate: true,
+            url: `/api/users/${this.login.value}/token`,
+            method: 'POST',
+            body: {
+                password: this.password.value
+            },
+            bodyType: 'JSON',
+            reload: false,
+            redirect: true,
+            showSuccessMsg: false
+        }
     }
 }
 

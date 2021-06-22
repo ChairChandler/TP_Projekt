@@ -6,13 +6,16 @@ import { SpeakersService } from './speakers/speakers.service';
 import { TokenGuard } from './token.guard';
 import { TokensService } from './users/tokens/tokens.service';
 import { UsersService } from './users/users.service';
+import { VoicesService } from './users/voices/voices.service';
+import * as path from 'path';
 
 @Controller()
 export class AppController {
   constructor(
     private speakerService: SpeakersService,
     private usersService: UsersService,
-    private tokensService: TokensService) {}
+    private tokensService: TokensService,
+    private voicesService: VoicesService) {}
 
   @Get()
   getLoginPage(@Req() req: Request, @Res() res: Response): void {
@@ -33,11 +36,13 @@ export class AppController {
   @UseGuards(TokenGuard)
   @Render('dashboard.hbs')
   async getUserDashboard(@Req() req: Request) {
+    const users = await this.usersService.getAll();
     const speakersBase = await this.speakerService.getSpeakers();
     
     return {
       page_role: 'user',
       user_info: this.getPrivileges(req),
+      users,
       speakersBase
     };
   }
@@ -47,12 +52,26 @@ export class AppController {
   @UseGuards(TokenGuard, RolesGuard)
   @Render('dashboard.hbs')
   async getAdminDashboard(@Req() req: Request) {
-    const speakersAdvanced = await this.speakerService.getSpeakers(true);
+    const users = await this.usersService.getAll();
+    const speakersAdvanced = await this.speakerService.getSpeakers();
+    const files = await Promise.all(speakersAdvanced.map(async s => {
+      const voices = await this.voicesService.findAll(s.uid);
+      return {
+        uid: s.uid, 
+        sid: s.sid, 
+        files: voices.map(v => ({
+          id: v.id, 
+          fname: path.basename(v.path)
+        }))
+      };
+    }));
+    
 
     return {
       page_role: 'admin',
       user_info: this.getPrivileges(req),
-      speakersAdvanced
+      users,
+      files
     };
   }
 
