@@ -27,3 +27,11 @@ header {
 .forms-collapse > form {
     display: block;
 }
+
+.alert-hidden {
+    visibility: hidden;
+}
+
+.alert-show {
+    color: red;
+}

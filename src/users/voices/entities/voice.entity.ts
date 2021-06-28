@@ -1,6 +1,5 @@
 import { UserEntity } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { SpeakerEntity } from "../../../speakers/entities/speaker.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('voice')
 export class VoiceEntity {
@@ -13,11 +12,9 @@ export class VoiceEntity {
     @ManyToOne(() => UserEntity, user => user.voices, {
         onDelete: 'CASCADE'
     })
-    owner: UserEntity;
-
-    @ManyToOne(() => SpeakerEntity, speaker => speaker.voices, {
-        nullable: true,
-        onDelete: 'SET NULL'    
+    @JoinColumn({ 
+        name: "name", 
+        referencedColumnName: "name"
     })
-    speaker: SpeakerEntity;
+    owner: UserEntity;
 }

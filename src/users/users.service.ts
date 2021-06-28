@@ -1,9 +1,10 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { SpeakerEntity } from 'src/speakers/entities/speaker.entity';
 import { Repository } from 'typeorm';
 import { Roles } from 'utils/roles';
 import { UserEntity } from './entities/user.entity';
 import { createHash } from 'crypto';
+import { VoiceEntity } from './voices/entities/voice.entity';
 
 @Injectable()
 export class UsersService {
@@ -11,17 +12,30 @@ export class UsersService {
         @Inject('USER_ENTITY') private users: Repository<UserEntity>, 
         @Inject('SPEAKER_ENTITY') private speakers: Repository<SpeakerEntity>) {}
 
-    async getAll(): Promise<UserEntity[]> {
-        return await this.users.find();
+    async getAll({relations} : {relations: boolean} = {relations: false}): Promise<UserEntity[]> {
+        if(relations) {
+            return await this.users.find({relations: ['voices', 'speaker']});
+        } else {
+            return await this.users.find();
+        }
     }
 
-    async findOne(name: string): Promise<UserEntity> {
-        return await this.users.findOne(name);
+    async findOne(name: string, {relations} : {relations: boolean} = {relations: false}): Promise<UserEntity> {
+        if(relations) {
+            return await this.users.findOne(name, {relations: ['voices', 'speaker']});
+        } else {
+            return await this.users.findOne(name);
+        }
     }
 
     async create(name: string, password: string, role: Roles): Promise<string> {
         try {
-            const entity = this.users.create({name, password_hash: this.createHash(password), role});
+            const entity = this.users.create({
+                name, 
+                password_hash: this.createHash(password), 
+                role,
+                voices: []
+            });
             await this.users.insert(entity);
             return entity.name;
         } catch(e) {
@@ -49,12 +63,18 @@ export class UsersService {
     }
 
     async setPassword(name: string, password: string): Promise<void> {
-        await this.users.update(name, {password_hash: password});
+        await this.users.update(name, {password_hash: this.createHash(password)});
     }
 
     async setSpeaker(name: string, speaker: number): Promise<void> {
         const user_s: SpeakerEntity = await this.speakers.findOne(speaker);
         await this.users.update(name, {speaker: user_s});
+    }
+
+    async appendVoice(name: string, voice: VoiceEntity): Promise<void> {
+        const user: UserEntity = await this.findOne(name, {relations: true});
+        user.voices.push(voice);
+        await this.users.save(user);
     }
 
     private createHash(txt: string) {

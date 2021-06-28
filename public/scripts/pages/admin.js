@@ -9,7 +9,7 @@ class AppModelForm extends AppForm {
 
         this.getInputs();
         this.getData();
-        this.user.addEventListener('click', ev => this.onChangeUser(ev));
+        this.user.addEventListener('change', ev => this.onChangeUser(ev));
     }
 
     metaDeliverVoices() {
@@ -53,10 +53,10 @@ class AppModelForm extends AppForm {
          * @type {HTMLInputElement}
          */
         this.files = document.querySelector('#files');
-        /**
-         * @type {HTMLSelectElement}
-         */
-        this.samples = document.querySelector('#samples');
+        // /**
+        //  * @type {HTMLSelectElement}
+        //  */
+        // this.samples = document.querySelector('#samples');
     }
 
     getData() {
@@ -82,17 +82,22 @@ class AppModelForm extends AppForm {
     }
 
     onChangeUser(ev) {
-        const username = ev.target.value;
-        const speaker = this.speakersList.filter(s => s.uid === username)[0];
-
         this.files.value = '';
-        this.samples.value = '';
-        for(const file of speaker.files) {
-            const option = document.createElement('option');
-            option.value = file;
-            option.text = file;
-            this.samples.appendChild(option);
-        }   
+        // this.samples.value = '';
+        this.files.removeAttribute('disabled');
+        // this.samples.removeAttribute('disabled');
+
+        if(this.speakersList.length) {
+            const username = ev.target.value;
+            const speaker = this.speakersList.filter(s => s.uid === username)[0];
+            
+            for(const file of speaker.files) {
+                const option = document.createElement('option');
+                option.value = file.id;
+                option.text = file.fname;
+                // this.samples.appendChild(option);
+            }   
+        }
     }
 }
 

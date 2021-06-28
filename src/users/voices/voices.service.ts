@@ -6,11 +6,13 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../users.service';
 import { VoiceEntity } from './entities/voice.entity';
 import { Stream } from 'stream';
+import { SpeakerEntity } from 'src/speakers/entities/speaker.entity';
 
 @Injectable()
 export class VoicesService {
   constructor(
     private usersService: UsersService,
+    @Inject('SPEAKER_ENTITY') private speakers: Repository<SpeakerEntity>,
     @Inject('VOICE_ENTITY') private voices: Repository<VoiceEntity>) {}
 
   async create(name: string, file: Express.Multer.File): Promise<number> {
@@ -21,15 +23,15 @@ export class VoicesService {
     const fpath = path.join(data_path, this.generateUniqueFilename());
     await fs.writeFile(fpath, file.buffer);
     
-    const owner_entity = await this.usersService.findOne(name);
+    const owner_entity = await this.usersService.findOne(name, {relations: true});
     
     const new_entity = this.voices.create({
       path: fpath, 
       owner: owner_entity, 
-      speaker: owner_entity.speaker
     });
 
     await this.voices.insert(new_entity);
+    await this.usersService.appendVoice(name, new_entity);
 
     return new_entity.id;
   }
@@ -50,7 +52,7 @@ export class VoicesService {
   }
 
   async findAll(name: string): Promise<VoiceEntity[]> {
-    const owner_entity = await this.usersService.findOne(name);
+    const owner_entity = await this.usersService.findOne(name, {relations: true});
     return owner_entity.voices;
   }
 

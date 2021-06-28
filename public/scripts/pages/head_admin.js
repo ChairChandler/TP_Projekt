@@ -127,7 +127,6 @@ class AppUserEditionForm extends AppForm {
 
     onPasswordChangeCheck(e) {
         this.passwordCanBeChanged = e.target.value;
-        console.log(this.passwordCanBeChanged)
         if(e.target.checked) {
             this.newPassword.removeAttribute('disabled');
         } else {

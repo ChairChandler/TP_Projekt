@@ -19,9 +19,6 @@ document.querySelector('#logout').addEventListener('click', async () => {
         // @ts-ignore
         Msg.error(js.message);
     } else {
-        // @ts-ignore
-        Msg.success(js.message);
-
         window.location.href = response.redirected ? response.url : window.location.href;
     }
 });

@@ -18,9 +18,9 @@ export class AppController {
     private voicesService: VoicesService) {}
 
   @Get()
-  getLoginPage(@Req() req: Request, @Res() res: Response): void {
+  async getLoginPage(@Req() req: Request, @Res() res: Response): Promise<void> {
     if(req.cookies['token']) {
-      if(this.tokensService.isLogged(req.cookies['token'])) {
+      if(await this.tokensService.isLogged(req.cookies['token'])) {
         res.status(HttpStatus.SEE_OTHER).location('/user').send();
       } else {
         res.cookie('token', null, {expires: new Date()})
@@ -42,7 +42,6 @@ export class AppController {
     return {
       page_role: 'user',
       user_info: this.getPrivileges(req),
-      users,
       speakersBase
     };
   }

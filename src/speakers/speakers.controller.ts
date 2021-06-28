@@ -30,7 +30,7 @@ export class SpeakersController {
     @Post(':sid')
     @UseInterceptors(FileInterceptor('file'))
     test(@Param('sid') sid: string,
-        @UploadedFile() file: Express.Multer.File): Promise<boolean> {
+        @UploadedFile() file: Express.Multer.File): Promise<{probability: Number}> {
             return this.speakersSerivice.testSpeaker(Number.parseInt(sid), file);
     }
 }
